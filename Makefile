@@ -6,13 +6,13 @@ PYTHON_VENV = $(VENV_BIN)/python
 
 # OS specific commands
 ifeq ($(OS),Windows_NT)
-    VENV_BIN = $(VENV)/Scripts
-    PYTHON_VENV = $(VENV_BIN)/python.exe
-	RM = rmdir /s /q
-	ACTIVATE = $(VENV_BIN)/activate.bat
+VENV_BIN = $(VENV)/Scripts
+PYTHON_VENV = $(VENV_BIN)/python.exe
+    RM = rmdir /s /q
+    ACTIVATE = $(VENV_BIN)/activate.bat
 else
-	RM = rm -rf
-	ACTIVATE = . $(VENV_BIN)/activate
+    RM = rm -rf
+    ACTIVATE = . $(VENV_BIN)/activate
 endif
 
 .PHONY: all
@@ -22,14 +22,18 @@ all: install
 venv:
 	@echo "Creating virtual environment..."
 	@$(PYTHON) -m venv $(VENV)
-	@$(PYTHON_VENV) -m pip install --upgrade pip
+	@$(PYTHON_VENV) -m pip install --upgrade pip setuptools wheel
 	@echo "Virtual environment created at $(VENV)"
 
 .PHONY: install
 install: venv
+	@echo "Checking Python version..."
+	@$(PYTHON_VENV) --version
+	@echo "Checking installed packages..."
+	@$(PYTHON_VENV) -m pip list
 	@echo "Installing package and dependencies..."
-	@$(PYTHON_VENV) -m pip install -e ".[dev]"
-	@$(PYTHON_VENV) -m pre-commit install
+	@$(PYTHON_VENV) -m pip install -e ".[dev]" pre-commit
+	@. $(ACTIVATE) && $(PYTHON_VENV) -m pre-commit install
 	@echo "Installation complete!"
 
 .PHONY: install-test
@@ -98,26 +102,17 @@ publish: build
 	@echo "Publishing to PyPI..."
 	@$(PYTHON_VENV) -m twine upload dist/*
 
-.PHONY: generate-test
-generate-test:
-	@echo "Generating test data..."
-	@$(PYTHON_VENV) dev/generate/create_graph.py
-	@$(PYTHON_VENV) dev/generate/create_grapherrors.py
-	@$(PYTHON_VENV) dev/generate/create_ttree.py
-	@echo "Test data generated!"
-
 .PHONY: help
 help:
 	@echo "Available commands:"
 	@echo "  make install         - Create venv and install all dependencies"
 	@echo "  make install-test    - Create venv and install test dependencies only"
-	@echo "  make format         - Format code using black, isort, and ruff"
-	@echo "  make lint           - Run all linters and type checks"
-	@echo "  make test           - Run tests"
-	@echo "  make coverage       - Run tests with coverage report"
-	@echo "  make generate-test  - Generate test data files"
-	@echo "  make clean          - Remove all build, test, and coverage files"
-	@echo "  make clean-venv     - Remove virtual environment and all build files"
-	@echo "  make build          - Build distribution packages"
-	@echo "  make publish-test   - Publish to Test PyPI"
-	@echo "  make publish        - Publish to PyPI"
+	@echo "  make format          - Format code using black, isort, and ruff"
+	@echo "  make lint            - Run all linters and type checks"
+	@echo "  make test            - Run tests"
+	@echo "  make coverage        - Run tests with coverage report"
+	@echo "  make clean           - Remove all build, test, and coverage files"
+	@echo "  make clean-venv      - Remove virtual environment and all build files"
+	@echo "  make build           - Build distribution packages"
+	@echo "  make publish-test    - Publish to Test PyPI"
+	@echo "  make publish         - Publish to PyPI"
