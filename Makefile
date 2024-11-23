@@ -1,3 +1,6 @@
+# Use Bash for execution
+SHELL := /bin/bash
+
 # Configuration
 PYTHON = python3
 VENV = .venv
@@ -8,11 +11,11 @@ PYTHON_VENV = $(VENV_BIN)/python
 ifeq ($(OS),Windows_NT)
 VENV_BIN = $(VENV)/Scripts
 PYTHON_VENV = $(VENV_BIN)/python.exe
-    RM = rmdir /s /q
-    ACTIVATE = $(VENV_BIN)/activate.bat
+RM = rmdir /s /q
+ACTIVATE = $(VENV_BIN)/activate.bat
 else
-    RM = rm -rf
-    ACTIVATE = . $(VENV_BIN)/activate
+RM = rm -rf
+ACTIVATE = $(VENV_BIN)/activate
 endif
 
 .PHONY: all
@@ -33,7 +36,7 @@ install: venv
 	@$(PYTHON_VENV) -m pip list
 	@echo "Installing package and dependencies..."
 	@$(PYTHON_VENV) -m pip install -e ".[dev]" pre-commit
-	@. $(ACTIVATE) && $(PYTHON_VENV) -m pre-commit install
+	@$(PYTHON_VENV) -m pre_commit install
 	@echo "Installation complete!"
 
 .PHONY: install-test
