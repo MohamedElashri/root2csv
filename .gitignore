@@ -1,6 +1,5 @@
 venv
 *.egg-info
-*txt
 *.csv
 __pycache__
 dev
