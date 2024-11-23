@@ -1,0 +1,9 @@
+venv
+*.egg-info
+*txt
+*.csv
+__pycache__
+dev
+setup.py
+*_cache
+.vscode
